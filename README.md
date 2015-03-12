@@ -1,5 +1,5 @@
 # Polar Flow Export
-Bookmarklet for exporting your Polar Flow data.
+Bookmarklet for exporting your [Polar Flow](https://flow.polar.com/) data.
 
 ### Installation
 Create a bookmark with following content:
