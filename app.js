@@ -15,14 +15,15 @@
         left: 0,
         zIndex: 9999,
         background: 'white',
-        padding: '0 40px'
+        padding: '0 40px',
+        boxSizing: 'border-box'
       }).
       appendTo($('body'));
 
     $('<h1>Export Polar flow data</h2>').val('foobar').appendTo($el);
     if (data) {
       $('<p>You may now copy-paste the information below to a spreadsheet program (such as Excel or Google Spreadsheet).</p>').appendTo($el);
-      $('<textarea></textarea>').css({width: '90%', height: 300}).val(data).appendTo($el);
+      $('<textarea></textarea>').css({width: '100%', height: 300}).val(data).appendTo($el);
     } else {
       $('<img />').
         attr('src', 'http://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif').
@@ -30,6 +31,11 @@
     }
 
     $('<br/>').appendTo($el);
+    var homepage = 'https://github.com/Pyppe/polar-flow-export';
+    $('<p>See <a href="'+homepage+'" target="_blank">'+homepage+'</a> for more details about this bookmarklet.</p>').
+      appendTo($el).find('a').css({
+        color: '#d10027'
+      });
     $('<button class="button" type="button">Close</button>').
       css({fontSize: '20px'}).
       click(function() {
