@@ -1,0 +1,137 @@
+(function() {
+
+  var ISO_DAY = 'YYYY-MM-DD';
+  var FIN_DAY = 'D.M.YYYY';
+
+  function showExport(data) {
+    $('#polar-flow-export').remove();
+    var $el = $('<div id="polar-flow-export"></div>');
+    $el.
+      css({
+        position: 'fixed',
+        width: '100%',
+        height: '100%',
+        top: 0,
+        left: 0,
+        zIndex: 9999,
+        background: 'white',
+        padding: '0 40px'
+      }).
+      appendTo($('body'));
+
+    $('<h1>Export Polar flow data</h2>').val('foobar').appendTo($el);
+    if (data) {
+      $('<textarea></textarea>').css({width: '90%', height: 300}).val(data).appendTo($el);
+    } else {
+      $('<img />').
+        attr('src', 'http://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif').
+        appendTo($el);
+    }
+
+    $('<br/>').appendTo($el);
+    $('<button class="button" type="button">Close</button>').
+      css({fontSize: '20px'}).
+      click(function() {
+        $el.remove();
+      }).
+      appendTo($el);
+  }
+
+  function parseDuration(str) {
+    function pad(n) {
+      return ("00" + n).slice(-2);
+    }
+    var re = /(\d+) hours? (\d+) minutes/g;
+    var m = re.exec(str);
+    return (m && m.length === 3) ?
+      [pad(m[1]), pad(m[2]), '00'].join(':') :
+      null;
+  }
+
+
+  function fetchData(start, end) {
+    var dayCount = end.diff(start, 'days');
+
+    var days = _.reduce(_.range(0,dayCount+1), function(acc, i) {
+      acc.push(moment(start).add(i,'d'));
+      return acc;
+    }, []);
+
+    var ts = new Date().getTime();
+    var futures = _.map(days, function(day) {
+      var finDay = day.format(FIN_DAY);
+      var url = [
+        'https://flow.polar.com/activity/summary/',
+        finDay,
+        '/',
+        finDay,
+        '/day?_=',
+        ts
+      ].join('');
+      return $.get(url).then(function(html) {
+        var $html = $('<div>'+html+'</div>');
+        var $sleep = $html.find('.sleep-tracked-icon-image:eq(0) > span');
+        var restfulSleepPercentage = $html.find('.sleep-tracked-icon-image:eq(1) .value-huge').text();
+        var stepCount = $html.find('.steps-icon-image .value-huge').text();
+        var distance = $html.find('.distance-icon-image .value-huge').text();
+        var kcal = $html.find('.calories-icon-image .value-huge').text();
+
+        if (stepCount && parseInt(stepCount) > 0) {
+          return {
+            day: day,
+            data: {
+              totalSleep: parseDuration($sleep.eq(0).text()),
+              restfulSleep: parseDuration($sleep.eq(2).text()),
+              restlessSleep: parseDuration($sleep.eq(3).text()),
+              restfulSleepPercentage: restfulSleepPercentage,
+              stepCount: stepCount,
+              distance: distance,
+              kcal: kcal
+            }
+          };
+        } else {
+          return null;
+        }
+
+      });
+    });
+
+    showExport(null);
+    $.when.apply($, futures).then(function() {
+      var header = ['Day', 'Steps', 'Distance', 'Calories (kcal)', 'Total sleep', 'Restful sleep', 'Restless sleep', 'Restful sleep %'].join('\t');
+      var rows = _.reduce(_.compact(arguments), function(acc, obj) {
+        var d = obj.data;
+        acc.push([obj.day.format(ISO_DAY), d.stepCount, d.distance, d.kcal, d.totalSleep, d.restfulSleep, d.restlessSleep, d.restfulSleepPercentage].join('\t'));
+        return acc;
+      }, [header]);
+      showExport(rows.join('\n'));
+    });
+  }
+
+  // START
+  (function() {
+    var example = moment().add(-7, 'd').format(ISO_DAY);
+    var startInput = prompt('Give either start day of export (e.g. '+example+') or number of days from now to export (e.g. 7)', '7');
+
+    var start = moment(startInput, ISO_DAY);
+    if (start.isValid()) {
+      example = moment().format(ISO_DAY);
+      var endInput = prompt('Give end day of export (e.g. '+example+')', example);
+      var end = moment(endInput, ISO_DAY);
+      if (end.isValid()) {
+        fetchData(start, end);
+      } else {
+        alert('Invalid input.')
+      }
+    } else if ((/^\d+$/gi).test(startInput)) {
+      fetchData(moment().subtract(parseInt(startInput), 'd'), moment());
+    } else {
+      alert('Invalid input.');
+    }
+
+  })();
+
+  //fetchData(moment('2015-03-09', ISO_DAY), moment('2015-03-10', ISO_DAY));
+
+})();
+
