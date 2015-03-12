@@ -21,6 +21,7 @@
 
     $('<h1>Export Polar flow data</h2>').val('foobar').appendTo($el);
     if (data) {
+      $('<p>You may now copy-paste the information below to a spreadsheet program (such as Excel or Google Spreadsheet).</p>').appendTo($el);
       $('<textarea></textarea>').css({width: '90%', height: 300}).val(data).appendTo($el);
     } else {
       $('<img />').
@@ -46,6 +47,24 @@
     return (m && m.length === 3) ?
       [pad(m[1]), pad(m[2]), '00'].join(':') :
       null;
+  }
+
+  function isOnCorrectPage() {
+    var correctPage = 'https://flow.polar.com/diary';
+    if (window.location.href.indexOf(correctPage) === 0) {
+      return true;
+    } else {
+      var redirect = confirm([
+        'You are not on correct page for export. Redirect to Polar Flow Diary?',
+        '',
+        'NOTE: You must re-run bookmarklet on that page.'
+      ].join('\n'));
+      if (redirect) {
+        window.location = correctPage;
+        return false;
+      }
+      return false;
+    }
   }
 
 
@@ -110,25 +129,26 @@
 
   // START
   (function() {
-    var example = moment().add(-7, 'd').format(ISO_DAY);
-    var startInput = prompt('Give either start day of export (e.g. '+example+') or number of days from now to export (e.g. 7)', '7');
+    if (isOnCorrectPage()) {
+      var example = moment().add(-7, 'd').format(ISO_DAY);
+      var startInput = prompt('Give either start day of export (e.g. '+example+') or number of days from now to export (e.g. 7)', '7');
 
-    var start = moment(startInput, ISO_DAY);
-    if (start.isValid()) {
-      example = moment().format(ISO_DAY);
-      var endInput = prompt('Give end day of export (e.g. '+example+')', example);
-      var end = moment(endInput, ISO_DAY);
-      if (end.isValid()) {
-        fetchData(start, end);
+      var start = moment(startInput, ISO_DAY);
+      if (start.isValid()) {
+        example = moment().format(ISO_DAY);
+        var endInput = prompt('Give end day of export (e.g. '+example+')', example);
+        var end = moment(endInput, ISO_DAY);
+        if (end.isValid()) {
+          fetchData(start, end);
+        } else {
+          alert('Invalid input.')
+        }
+      } else if ((/^\d+$/gi).test(startInput)) {
+        fetchData(moment().subtract(parseInt(startInput), 'd'), moment());
       } else {
-        alert('Invalid input.')
+        alert('Invalid input.');
       }
-    } else if ((/^\d+$/gi).test(startInput)) {
-      fetchData(moment().subtract(parseInt(startInput), 'd'), moment());
-    } else {
-      alert('Invalid input.');
     }
-
   })();
 
   //fetchData(moment('2015-03-09', ISO_DAY), moment('2015-03-10', ISO_DAY));
