@@ -1,6 +1,9 @@
 # Polar Flow Export
 Bookmarklet for exporting your [Polar Flow](https://flow.polar.com/) data.
 
+![Screenshot](/polar-flow-export.png?raw=true "Screenshot")
+
+
 ### Installation
 Create a bookmark with following content:
 ```javascript
