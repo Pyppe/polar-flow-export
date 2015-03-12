@@ -1,2 +1,2 @@
-# polar-flow-export
-Bookmarklet for export Polar Flow data.
+# Polar Flow Export
+Bookmarklet for exporting your Polar Flow data.
