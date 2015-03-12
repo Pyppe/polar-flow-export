@@ -1,6 +1,7 @@
 # Polar Flow Export
 Bookmarklet for exporting your [Polar Flow](https://flow.polar.com/) data.
 
+### Screenshot
 ![Screenshot](/polar-flow-export.png?raw=true "Screenshot")
 
 
