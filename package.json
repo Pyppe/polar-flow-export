@@ -1,0 +1,22 @@
+{
+  "name": "polar-flow-export",
+  "version": "1.0.0",
+  "description": "Bookmarklet for exporting your [Polar Flow](https://flow.polar.com/) data.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pyppe/polar-flow-export.git"
+  },
+  "author": "Pyry-Samuli Lahti",
+  "bugs": {
+    "url": "https://github.com/Pyppe/polar-flow-export/issues"
+  },
+  "homepage": "https://github.com/Pyppe/polar-flow-export",
+  "dependencies": {
+    "lodash": "^3.5.0",
+    "uglify-js": "^2.4.17"
+  }
+}
