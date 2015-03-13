@@ -5,7 +5,7 @@ var fs     = require('fs');
 var uglify = require('uglify-js');
 
 function jsWrap(js) {
-  return 'javascript:(' + js + ');'
+  return 'javascript:(function(){'+js.replace(/\t/g,'\\t')+'})();'
 }
 
 var minifiedCode = uglify.minify('app.js').code;

@@ -130,7 +130,6 @@
     $.when.apply($, futures).then(function() {
       var rows = _.reduce(_.compact(arguments), function(acc, obj, i) {
         var rows = obj.rows;
-        console.log(JSON.stringify(rows));
         if (i === 0) {
           acc.push(_.pluck(rows,'title').join('\t'));
         }
