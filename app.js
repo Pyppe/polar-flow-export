@@ -94,25 +94,30 @@
         ts
       ].join('');
       return $.get(url).then(function(html) {
+        function item(title, value) {
+          return {
+            title: title,
+            value: value
+          };
+        }
         var $html = $('<div>'+html+'</div>');
         var $sleep = $html.find('.sleep-tracked-icon-image:eq(0) > span');
-        var restfulSleepPercentage = $html.find('.sleep-tracked-icon-image:eq(1) .value-huge').text();
         var stepCount = $html.find('.steps-icon-image .value-huge').text();
-        var distance = $html.find('.distance-icon-image .value-huge').text();
-        var kcal = $html.find('.calories-icon-image .value-huge').text();
-
         if (stepCount && parseInt(stepCount) > 0) {
           return {
             day: day,
-            data: {
-              totalSleep: parseDuration($sleep.eq(0).text()),
-              restfulSleep: parseDuration($sleep.eq(2).text()),
-              restlessSleep: parseDuration($sleep.eq(3).text()),
-              restfulSleepPercentage: restfulSleepPercentage,
-              stepCount: stepCount,
-              distance: distance,
-              kcal: kcal
-            }
+            rows: [
+              item('Day',               day.format(ISO_DAY)),
+              item('Steps',             stepCount),
+              item('Distance',          $html.find('.distance-icon-image .value-huge').text()),
+              item('Calories',          $html.find('.calories-icon-image .value-huge').text()),
+              item('Activity time',     parseDuration($html.find('.active-time-icon-image .value-huge').text())),
+              item('Inactivity stamps', $html.find('.inactivity-icon-image .value-huge').text()),
+              item('Total sleep',       parseDuration($sleep.eq(0).text())),
+              item('Restful sleep',     parseDuration($sleep.eq(2).text())),
+              item('Restless sleep',    parseDuration($sleep.eq(3).text())),
+              item('Restful sleep %',   $html.find('.sleep-tracked-icon-image:eq(1) .value-huge').text())
+            ]
           };
         } else {
           return null;
@@ -123,12 +128,15 @@
 
     showExport(null);
     $.when.apply($, futures).then(function() {
-      var header = ['Day', 'Steps', 'Distance', 'Calories (kcal)', 'Total sleep', 'Restful sleep', 'Restless sleep', 'Restful sleep %'].join('\t');
-      var rows = _.reduce(_.compact(arguments), function(acc, obj) {
-        var d = obj.data;
-        acc.push([obj.day.format(ISO_DAY), d.stepCount, d.distance, d.kcal, d.totalSleep, d.restfulSleep, d.restlessSleep, d.restfulSleepPercentage].join('\t'));
+      var rows = _.reduce(_.compact(arguments), function(acc, obj, i) {
+        var rows = obj.rows;
+        console.log(JSON.stringify(rows));
+        if (i === 0) {
+          acc.push(_.pluck(rows,'title').join('\t'));
+        }
+        acc.push(_.pluck(rows,'value').join('\t'));
         return acc;
-      }, [header]);
+      }, []);
       showExport(rows.join('\n'));
     });
   }
