@@ -9,3 +9,14 @@ javascript:(function(){!function(){function e(e){$("#polar-flow-export").remove(
 
 ### Screenshot
 ![Screenshot](/polar-flow-export.png?raw=true "Screenshot")
+
+### Why, oh why?
+Because the UI of Polar Flow doesn't give you very good summary views.
+Exporting data in tabular form gives you the freedom to create graphs
+that are relevant to you. For example, this graph shows that I probably should
+sleep more during weekdays...
+
+![Graph](/polar-graph-example.png?raw=true "Graph")
+
+Also: why not?
+
